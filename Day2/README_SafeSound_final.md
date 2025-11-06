@@ -1,3 +1,5 @@
+Safe sound is a prototype for a program where the user can input different sounds, combine them and know if these sounds (individual or summed) might be dangerous for humans, dogs or cats. 
+
 I used Claude Sonnet 4 in Copliot in VSC
 
 ## Prompt 1
