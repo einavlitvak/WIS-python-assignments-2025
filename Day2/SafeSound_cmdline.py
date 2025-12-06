@@ -1,0 +1,351 @@
+"""
+Sound Safety Analyzer - Command Line Version
+A program that combines multiple sine waves and analyzes their safety for humans, dogs, and cats.
+
+Usage: python SafeSound_cmdline.py amplitude frequency shift seconds [amplitude frequency shift seconds ...]
+
+Example: python SafeSound_cmdline.py 0.5 440 0 2.0 0.8 880 1.57 1.5
+This creates two waves:
+- Wave 1: amplitude=0.5, frequency=440Hz, phase_shift=0, duration=2.0s
+- Wave 2: amplitude=0.8, frequency=880Hz, phase_shift=1.57, duration=1.5s
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+from typing import List, Tuple, Dict
+import math
+import sys
+
+class SineWave:
+    """Represents a single sine wave with customizable parameters."""
+    
+    def __init__(self, amplitude: float, frequency: float, phase_shift: float = 0, duration: float = 1.0):
+        """
+        Initialize a sine wave.
+        
+        Args:
+            amplitude: Amplitude multiplier (affects volume/intensity)
+            frequency: Frequency in Hz (cycles per second)
+            phase_shift: Phase shift in radians
+            duration: Duration of the wave in seconds
+        """
+        self.amplitude = amplitude
+        self.frequency = frequency
+        self.phase_shift = phase_shift
+        self.duration = duration
+    
+    def generate(self, time_array: np.ndarray) -> np.ndarray:
+        """Generate the sine wave values for given time points."""
+        return self.amplitude * np.sin(2 * np.pi * self.frequency * time_array + self.phase_shift)
+
+class SoundSafetyAnalyzer:
+    """Analyzes sound safety for different species."""
+    
+    # Hearing frequency ranges (Hz) for different species
+    HEARING_RANGES = {
+        'human': (20, 20000),
+        'dog': (67, 45000),
+        'cat': (48, 85000)
+    }
+    
+    # Safe amplitude thresholds (relative units)
+    # These are simplified thresholds - in reality, safety depends on frequency and exposure time
+    SAFE_AMPLITUDE_THRESHOLDS = {
+        'human': 1.0,     # Reference safe level
+        'dog': 0.8,       # Dogs are more sensitive
+        'cat': 0.7        # Cats are most sensitive
+    }
+    
+    # Frequency-specific danger zones (frequencies that are particularly sensitive)
+    SENSITIVE_FREQUENCIES = {
+        'human': [(1000, 4000)],      # Most sensitive hearing range
+        'dog': [(8000, 16000)],       # Ultrasonic sensitivity
+        'cat': [(2000, 6000), (16000, 32000)]  # Multiple sensitive ranges
+    }
+    
+    def __init__(self):
+        self.waves = []
+    
+    def add_wave(self, wave: SineWave):
+        """Add a sine wave to the collection."""
+        self.waves.append(wave)
+    
+    def combine_waves(self, sample_rate: int = 44100) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Combine all sine waves into a single waveform.
+        
+        Args:
+            sample_rate: Sampling rate in Hz
+            
+        Returns:
+            Tuple of (time_array, combined_amplitude_array)
+        """
+        if not self.waves:
+            return np.array([]), np.array([])
+        
+        # Find the maximum duration
+        max_duration = max(wave.duration for wave in self.waves)
+        
+        # Create time array
+        time_array = np.linspace(0, max_duration, int(sample_rate * max_duration))
+        
+        # Initialize combined wave
+        combined_wave = np.zeros_like(time_array)
+        
+        # Add each wave to the combination
+        for wave in self.waves:
+            # Only add the wave for its specified duration
+            wave_samples = int(sample_rate * wave.duration)
+            if wave_samples <= len(time_array):
+                wave_time = time_array[:wave_samples]
+                wave_values = wave.generate(wave_time)
+                combined_wave[:wave_samples] += wave_values
+        
+        return time_array, combined_wave
+    
+    def analyze_safety(self) -> Dict[str, Dict]:
+        """
+        Analyze the safety of the combined sound for each species.
+        
+        Returns:
+            Dictionary with safety analysis for each species
+        """
+        time_array, combined_wave = self.combine_waves()
+        
+        if len(combined_wave) == 0:
+            return {}
+        
+        # Calculate overall amplitude metrics
+        max_amplitude = np.max(np.abs(combined_wave))
+        rms_amplitude = np.sqrt(np.mean(combined_wave**2))
+        
+        results = {}
+        
+        for species in ['human', 'dog', 'cat']:
+            species_result = {
+                'safe': True,
+                'warnings': [],
+                'max_amplitude': max_amplitude,
+                'rms_amplitude': rms_amplitude,
+                'frequencies_present': []
+            }
+            
+            # Check amplitude safety
+            threshold = self.SAFE_AMPLITUDE_THRESHOLDS[species]
+            if max_amplitude > threshold:
+                species_result['safe'] = False
+                species_result['warnings'].append(
+                    f"Amplitude too high: {max_amplitude:.2f} > {threshold:.2f} (safe limit)"
+                )
+            
+            # Analyze frequency content
+            for wave in self.waves:
+                freq = wave.frequency
+                amp = wave.amplitude
+                
+                # Check if frequency is in audible range
+                min_freq, max_freq = self.HEARING_RANGES[species]
+                if min_freq <= freq <= max_freq:
+                    species_result['frequencies_present'].append(freq)
+                    
+                    # Check if frequency is in sensitive range
+                    for sensitive_range in self.SENSITIVE_FREQUENCIES[species]:
+                        if sensitive_range[0] <= freq <= sensitive_range[1]:
+                            if amp > threshold * 0.5:  # More strict for sensitive frequencies
+                                species_result['safe'] = False
+                                species_result['warnings'].append(
+                                    f"High amplitude ({amp:.2f}) at sensitive frequency {freq:.1f} Hz"
+                                )
+            
+            results[species] = species_result
+        
+        return results
+    
+    def print_safety_report(self):
+        """Print a comprehensive safety report."""
+        results = self.analyze_safety()
+        
+        print("=" * 60)
+        print("SOUND SAFETY ANALYSIS REPORT")
+        print("=" * 60)
+        
+        if not results:
+            print("No waves to analyze.")
+            return
+        
+        # Print wave summary
+        print(f"\nWAVE SUMMARY:")
+        print(f"Number of waves: {len(self.waves)}")
+        for i, wave in enumerate(self.waves, 1):
+            print(f"  Wave {i}: Amplitude={wave.amplitude:.2f}, "
+                  f"Frequency={wave.frequency:.1f} Hz, "
+                  f"Phase={wave.phase_shift:.2f} rad, "
+                  f"Duration={wave.duration:.1f}s")
+        
+        # Print safety analysis for each species
+        for species, result in results.items():
+            print(f"\n{species.upper()} SAFETY:")
+            status = "✓ SAFE" if result['safe'] else "⚠ POTENTIALLY DANGEROUS"
+            print(f"  Status: {status}")
+            print(f"  Max Amplitude: {result['max_amplitude']:.3f}")
+            print(f"  RMS Amplitude: {result['rms_amplitude']:.3f}")
+            
+            if result['frequencies_present']:
+                audible_freqs = result['frequencies_present']
+                print(f"  Audible frequencies: {[f'{f:.1f}' for f in audible_freqs]} Hz")
+            else:
+                print("  No audible frequencies detected")
+            
+            if result['warnings']:
+                print("  Warnings:")
+                for warning in result['warnings']:
+                    print(f"    - {warning}")
+        
+        print("\n" + "=" * 60)
+    
+    def plot_waveform(self, show_plot: bool = True):
+        """Plot the combined waveform."""
+        time_array, combined_wave = self.combine_waves()
+        
+        if len(combined_wave) == 0:
+            print("No waves to plot.")
+            return
+        
+        plt.figure(figsize=(12, 8))
+        
+        # Plot individual waves
+        plt.subplot(2, 1, 1)
+        for i, wave in enumerate(self.waves):
+            wave_samples = int(44100 * wave.duration)
+            wave_time = time_array[:wave_samples]
+            wave_values = wave.generate(wave_time)
+            plt.plot(wave_time, wave_values, alpha=0.7, 
+                    label=f'Wave {i+1}: {wave.frequency:.1f} Hz')
+        
+        plt.title('Individual Sine Waves')
+        plt.xlabel('Time (seconds)')
+        plt.ylabel('Amplitude')
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        
+        # Plot combined wave
+        plt.subplot(2, 1, 2)
+        plt.plot(time_array, combined_wave, 'b-', linewidth=1.5)
+        plt.title('Combined Waveform')
+        plt.xlabel('Time (seconds)')
+        plt.ylabel('Amplitude')
+        plt.grid(True, alpha=0.3)
+        
+        # Add safety threshold lines
+        for species, threshold in self.SAFE_AMPLITUDE_THRESHOLDS.items():
+            plt.axhline(y=threshold, color='red', linestyle='--', alpha=0.7, 
+                       label=f'{species.capitalize()} threshold')
+            plt.axhline(y=-threshold, color='red', linestyle='--', alpha=0.7)
+        
+        plt.legend()
+        plt.tight_layout()
+        
+        if show_plot:
+            plt.show()
+        
+        return plt.gcf()
+
+
+def parse_command_line_args() -> SoundSafetyAnalyzer:
+    """Parse command line arguments and create analyzer with waves."""
+    if len(sys.argv) < 5:
+        print("Error: Insufficient arguments.")
+        print_usage()
+        sys.exit(1)
+    
+    # Remove script name from arguments
+    args = sys.argv[1:]
+    
+    # Check if number of arguments is divisible by 4
+    if len(args) % 4 != 0:
+        print("Error: Arguments must be in groups of 4 (amplitude, frequency, shift, seconds).")
+        print_usage()
+        sys.exit(1)
+    
+    analyzer = SoundSafetyAnalyzer()
+    
+    # Process arguments in groups of 4
+    for i in range(0, len(args), 4):
+        try:
+            amplitude = float(args[i])
+            frequency = float(args[i + 1])
+            phase_shift = float(args[i + 2])
+            duration = float(args[i + 3])
+            
+            wave = SineWave(amplitude, frequency, phase_shift, duration)
+            analyzer.add_wave(wave)
+            
+            print(f"Added Wave {len(analyzer.waves)}: A={amplitude}, F={frequency}Hz, P={phase_shift}rad, D={duration}s")
+            
+        except ValueError as e:
+            print(f"Error parsing arguments at position {i+1}-{i+4}: {e}")
+            print("All arguments must be numeric values.")
+            sys.exit(1)
+        except IndexError:
+            print("Error: Incomplete wave parameters.")
+            print_usage()
+            sys.exit(1)
+    
+    return analyzer
+
+
+def print_usage():
+    """Print usage instructions."""
+    print("\nUsage:")
+    print("  python SafeSound_cmdline.py amplitude frequency shift seconds [amplitude frequency shift seconds ...]")
+    print("\nParameters (in order for each wave):")
+    print("  amplitude    - Amplitude multiplier (e.g., 0.5, 1.0, 1.5)")
+    print("  frequency    - Frequency in Hz (e.g., 440, 880)")
+    print("  shift        - Phase shift in radians (e.g., 0, 1.57)")
+    print("  seconds      - Duration in seconds (e.g., 1.0, 2.5)")
+    print("\nExample:")
+    print("  python SafeSound_cmdline.py 0.5 440 0 2.0 0.8 880 1.57 1.5")
+    print("  This creates two waves:")
+    print("    Wave 1: amplitude=0.5, frequency=440Hz, phase_shift=0, duration=2.0s")
+    print("    Wave 2: amplitude=0.8, frequency=880Hz, phase_shift=1.57, duration=1.5s")
+
+
+def main():
+    """Main program function."""
+    print("SafeSound - Sound Safety Analyzer (Command Line Version)")
+    print("=" * 60)
+    
+    if len(sys.argv) == 1:
+        print("No arguments provided.")
+        print_usage()
+        return
+    
+    # Special case for help
+    if len(sys.argv) == 2 and sys.argv[1].lower() in ['-h', '--help', 'help']:
+        print_usage()
+        return
+    
+    # Parse command line arguments
+    analyzer = parse_command_line_args()
+    
+    if len(analyzer.waves) == 0:
+        print("No valid waves created. Exiting.")
+        return
+    
+    print(f"\nSuccessfully created {len(analyzer.waves)} wave(s).")
+    print("\nAnalyzing sound safety...")
+    
+    # Analyze and print safety report
+    analyzer.print_safety_report()
+    
+    # Ask if user wants to see the plot
+    try:
+        plot_choice = input("\nWould you like to see a plot of the waveforms? (y/n): ").strip().lower()
+        if plot_choice in ['y', 'yes']:
+            analyzer.plot_waveform()
+    except (KeyboardInterrupt, EOFError):
+        print("\nExiting...")
+
+
+if __name__ == "__main__":
+    main()
