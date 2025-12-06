@@ -1,3 +1,5 @@
+I thought it would be easier to not open the actual issues, to avoid confusion for them. But I took to projects and these are the issues I would have opened to each of them:
+
 Amino acid structure game (Avigail Yariv)
 Hi Avigail. Your game is really cool and useful! I thought of some minor improvements for it, after trying it a few times:
 - I would add maybe that it can reconize some typos. like i wrote 'tirosine' instead of 'tyrosine', and it didn't accept it at all even though I was on the right track... it could have a feature of accepting a result (maybe as half a point) but letting you know you have a typo.
