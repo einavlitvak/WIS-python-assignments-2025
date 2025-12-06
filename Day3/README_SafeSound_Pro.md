@@ -2,6 +2,13 @@
 
 SafeSound Pro is a modern GUI application designed to synthesize, visualize, and analyze sound waves. Its primary purpose is to determine if a combination of sound waves is safe for Humans, Dogs, and Cats based on amplitude thresholds and frequency sensitivity.
 
+## Promt used
+are there any 3rd prty libraries or modules that we could implement for the GUI? If so, first tell me what they are and then I'll decide which one i want to implement. 
+
+create a new file called SafeSound_GUI_W_libraries. and add all these changes. about the soundplayback: add it but as a button that says 'play sound' and if it is out of range, add a warning box that says 'Warning! this sound has been deemed not safe for [list of species]! We do NOT recomend playing'. And then give the option to play it or not
+
+add a readme file that explains the upgrades done by using external libraries, add examples of waves that when summed will be safe for all species and another example that will not be safe.
+
 ## Features & Improvements
 
 This version (`SafeSound_GUI_W_libraries.py`) is a significant upgrade over the original prototype, incorporating professional-grade Python libraries for better performance and user experience.

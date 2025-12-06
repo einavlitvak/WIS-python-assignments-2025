@@ -2,6 +2,10 @@
 
 SafeSound is a tool designed to analyze the safety of combined sound waves for different species (humans, dogs, and cats). It allows you to input multiple sine waves with specific parameters, combines them, and evaluates whether the resulting sound exceeds safe amplitude thresholds or enters sensitive frequency ranges.
 
+## Promt used
+copy the SafeSound_GUI from Day2 folder to Day3. Separate them to the bussiness logic and the user interface. 
+
+
 ## Table of Contents
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
