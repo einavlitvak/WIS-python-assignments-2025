@@ -1,0 +1,28 @@
+Amino acid structure game (Avigail Yariv)
+Hi Avigail. Your game is really cool and useful! I thought of some minor improvements for it, after trying it a few times:
+- I would add maybe that it can reconize some typos. like i wrote 'tirosine' instead of 'tyrosine', and it didn't accept it at all even though I was on the right track... it could have a feature of accepting a result (maybe as half a point) but letting you know you have a typo.
+- for people that have no previous knowledge, maybe have a list pop up with all the aa names 
+- the score goes to negative. is that intentional? 
+
+birthday_soon_to_be (Yana Lerner)
+Hi Yana! Cute idea!! I thought the GUI was really cute and loved the little animations :). 
+- I found a few typos while reading the readme so then i asked AI to find all typos in the file and this was the output:
+Line 2: "virsions" → "versions" (appears twice)
+Line 2: "extanstions" → "extensions"
+Line 2: "needead" → "needed"
+Line 2: "virsion" → "version"
+Line 10: "calculte" → "calculate"
+Line 10: "weaks" → "weeks"
+Line 13: "fell" → "feel"
+Line 16: "confussed" → "confused"
+Line 16: "becuse" → "because"
+Line 22: "But I know we can't pip install becuse we use UV" → "because"
+Line 28: "virtul" → "virtual"
+Line 65: "ttkrhemes" → "ttkthemes"
+Line 72: "dosen't" → "doesn't"
+Line 72: "extantions" → "extensions"
+Line 72: "virsions" → "versions"
+- issue with how its calculating the time until birthday, I typed in a birthday and the calculation wasnt correct. 
+I asked AI to explain what the issue with code is and it wrote: 
+I see the problem. The calculation uses total_days // 30 which is a rough approximation. For a birthday on June 4th when today is December 6th, the next birthday is June 4, 2026 - which is exactly 6 months and 2 days away (Dec has 31 days, so 25 days left in Dec + Jan 31 + Feb 28/29 + Mar 31 + Apr 30 + May 31 + 4 days in June = 179-180 days, which divided by 30 gives ~5.9 months).
+- I'm running on Linux and apparnetly the code is implementing some emojis next to the title that dont render well for linux. Maybe that could be considered
