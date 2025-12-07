@@ -26,7 +26,7 @@ python ui.py
 
 
 ## Prompt Used
-> i want to use an israeli wather channel. I want to get the type of weather expected for morning, afternoon and evening (kind of an average of the by hour, from 6 am to 12 pm, from 12pm to 6pm and from 6pm to 12 am). for each of the day frames, give low-high temperature, type of weather (sunny, cloudy, rainy,etc), humidity. then give recomendations for how to dress aproppiately, and from thesaurus.com also get the word of the day and include it with the definition. 
+> i want to use an israeli weather channel. I want to get the type of weather expected for morning, afternoon and evening (kind of an average of the by hour, from 6 am to 12 pm, from 12pm to 6pm and from 6pm to 12 am). for each of the day frames, give low-high temperature, type of weather (sunny, cloudy, rainy,etc), humidity. then give recomendations for how to dress aproppiately, and from thesaurus.com also get the word of the day and include it with the definition. 
 > add a readme file explaining the new program adding as par of the markdown the promt used
 > great, id like to re-add the pronounciation of the word as a fourth row! Instead of a txt, i would like to get a nice pop up window with all this information. i would like to get a 'Hey, Einav! Its a great day for great things today.... Here is what to expect of the weather' and then all the info
 > great! lets change the format a bit. make the four panels be in a 2x2 grid and mke sure there is no need to scroll to see all the info
