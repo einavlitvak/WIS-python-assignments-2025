@@ -118,4 +118,3 @@ while not game_over:
     if all_ships_sunk:
         print('Battle over!')
         game_over = True
-

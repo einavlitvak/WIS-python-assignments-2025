@@ -20,5 +20,8 @@ The user's goal is to sink all ships by entering coordinates (X, Y).
 4. Keep playing until all ships are sunk!
 
 ## Use of AI
-
+# For Battlefield.py
 I used AI to help me understand and work through the logic of how to write what i wanted, but I wrote all lines myself!
+
+# For tests
+I used AI to generate the tests. For that, it created the Battlefield_AI.py to change the original file to have classes and functions that would allow it to actually run the tests. 
