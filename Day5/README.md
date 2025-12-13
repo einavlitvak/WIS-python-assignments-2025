@@ -19,3 +19,6 @@ The user's goal is to sink all ships by entering coordinates (X, Y).
 3. Enter X and Y coordinates (0-4) when prompted.
 4. Keep playing until all ships are sunk!
 
+## Use of AI
+
+I used AI to help me understand and work through the logic of how to write what i wanted, but I wrote all lines myself!
