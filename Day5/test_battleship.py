@@ -1,5 +1,5 @@
 import pytest
-from Battlefield_AI import BattleshipGame
+from Battleship_AI import BattleshipGame
 
 def test_initialization():
     """Test that the game initializes with the correct board size and number of ships."""
