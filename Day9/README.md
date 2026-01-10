@@ -2,6 +2,8 @@
 
 This project analyzes student submissions (`subjects.txt`) against assignment deadlines (`README_day9.md`) to generate a comprehensive performance report and visual analytics.
 
+Found a mistake in subjects.txt: If I understood correctly, the timestamps in that file are actually the time when the issues were closed and not when they were created (opened, assignment submitted). So some of the statistics are not correct.
+
 ## Files
 *   `assignment_report.py`: The main script.
 *   `requirements.txt`: Python dependencies.
